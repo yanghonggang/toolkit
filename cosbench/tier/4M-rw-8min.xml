@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workload name="um-cos-4m-8min-rw" description="sample benchmark for s3">
+
+  <storage type="s3" config="accesskey=0555b35654ad1656d804;secretkey=h7GhxuBLTrlhVUyxSPUKUV8r/2EI4ngqJxD7iBdBYLhwluN30JaT3Q==;endpoint=http://127.0.0.1:8000" />
+
+  <workflow>
+    <workstage name="init">
+      <work type="init" workers="1" config="cprefix=um-cos;containers=r(1,3)" />
+    </workstage>
+    <workstage name="prepare">
+      <work type="prepare" workers="100" config="cprefix=um-cos;containers=r(1,3);objects=r(1,12000);sizes=c(4096)KB" />
+    </workstage>
+
+<!-- read -->
+    <workstage name="um_4m_8min_read*600">
+      <work name="main" workers="600" runtime="480">
+        <operation type="read" ratio="100" config="cprefix=um-cos;containers=u(1,3);objects=u(1,12000)" />
+      </work>
+    </workstage>
+<!-- write -->
+    <workstage name="um_4m_8min_write*600">
+      <work name="main" workers="600" runtime="480">
+        <operation type="write" ratio="100" config="cprefix=um-cos;containers=u(1,3);objects=u(1,12000);sizes=c(4096)KB" />
+      </work>
+    </workstage>
+    <workstage name="cleanup">
+      <work type="cleanup" workers="6" config="cprefix=um-cos;containers=r(1,3);objects=r(1,12000)" />
+    </workstage>
+
+    <workstage name="dispose">
+      <work type="dispose" workers="1" config="cprefix=um-cos;containers=r(1,3)" />
+    </workstage>
+
+  </workflow>
+</workload>
