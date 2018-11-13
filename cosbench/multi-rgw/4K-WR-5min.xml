@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workload name="um-cos-4k-5min-rw" description="sample benchmark for s3">
+
+  <storage type="s3" config="accesskey=GG6VM45IJBWB2IPDM25J;secretkey=vXijwXAPc86ilPC7f0jrbUoYmBSy3S1sBNJ8ZdmF;endpoint=http://10.52.39.73:8080;timeout=100000" />
+
+  <workflow>
+    <workstage name="init">
+      <work type="init" workers="1" config="cprefix=um-cos-1;containers=r(1,2)" />
+      <work type="init" workers="1" config="cprefix=um-cos-2;containers=r(1,2)" />
+    </workstage>
+
+<!-- write -->
+    <workstage name="um_4k_write">
+      <work name="write1" workers="650" totalOps="1300"  driver="driver1">
+  	<storage type="s3" config="accesskey=GG6VM45IJBWB2IPDM25J;secretkey=vXijwXAPc86ilPC7f0jrbUoYmBSy3S1sBNJ8ZdmF;endpoint=http://10.52.39.73:8080;timeout=3000000" />
+        <operation type="write" ratio="100" config="cprefix=um-cos-1;containers=c(1,2);objects=s(1,1300);sizes=c(4)KB" />
+       </work>
+
+       <work name="write2" workers="650" totalOps="1300"  driver="driver2">
+  	<storage type="s3" config="accesskey=GG6VM45IJBWB2IPDM25J;secretkey=vXijwXAPc86ilPC7f0jrbUoYmBSy3S1sBNJ8ZdmF;endpoint=http://10.52.39.74:8080;timeout=3000000" />
+        <operation type="write" ratio="100" config="cprefix=um-cos-2;containers=c(1,2);objects=s(1,1300);sizes=c(4)KB" />
+       </work>
+    </workstage>
+
+<!-- read -->
+    <workstage name="um_4k_read">
+      <work name="read1" workers="650" totalOps="1300"  driver="driver1">
+  	<storage type="s3" config="accesskey=GG6VM45IJBWB2IPDM25J;secretkey=vXijwXAPc86ilPC7f0jrbUoYmBSy3S1sBNJ8ZdmF;endpoint=http://10.52.39.73:8080;timeout=3000000" />
+        <operation type="read" ratio="100" config="cprefix=um-cos-1;containers=c(1,2);objects=s(1,1300);sizes=c(4)KB" />
+       </work>
+
+       <work name="read2" workers="650" totalOps="1300"  driver="driver2">
+  	<storage type="s3" config="accesskey=GG6VM45IJBWB2IPDM25J;secretkey=vXijwXAPc86ilPC7f0jrbUoYmBSy3S1sBNJ8ZdmF;endpoint=http://10.52.39.74:8080;timeout=3000000" />
+        <operation type="read" ratio="100" config="cprefix=um-cos-2;containers=c(1,2);objects=s(1,1300);sizes=c(4)KB" />
+       </work>
+    </workstage>
+
+    <workstage name="cleanup">
+      <work type="cleanup" workers="1" config="cprefix=um-cos-1;containers=r(1,2);objects=r(1,1300)" />
+      <work type="cleanup" workers="1" config="cprefix=um-cos-2;containers=r(1,2);objects=r(1,1300)" />
+    </workstage>
+
+    <workstage name="dispose">
+      <work type="dispose" workers="1" config="cprefix=um-cos-1;containers=r(1,2)" />
+      <work type="dispose" workers="1" config="cprefix=um-cos-2;containers=r(1,2)" />
+    </workstage>
+
+  </workflow>
+</workload>
