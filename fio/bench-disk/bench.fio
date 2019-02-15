@@ -1,0 +1,17 @@
+[global]
+direct=1
+ioengine=libaio
+filename=${FILE}
+rw=${TYPE}
+size=100%
+runtime=${RTIME}
+time_based
+refill_buffers
+ramp_time=30
+iodepth=64
+thread=1
+group_reporting
+
+[jobs]
+numjobs=16
+bs=${SIZE}
