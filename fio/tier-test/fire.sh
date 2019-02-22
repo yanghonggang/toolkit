@@ -1,15 +1,10 @@
 #!/bin/bash
 
-##POOL="rbd"
-##HOSTS="umstor-01 umstor-02 umstor-03"
-##SIZE="500G"
-##DISK="disk0"
-
-POOL="cachepool"
-HOSTS="um14"
-SIZE="1G"
+POOL="rbd"
+HOSTS="umstor001 umstor002"
+SIZE="500G"
 DISK="disk0"
-RTIME="1"
+RTIME="600"
 
 function drop_cache {
   for h in $HOSTS
@@ -24,9 +19,7 @@ function drop_cache {
 function prepare_disk {
   rbd -p $POOL remove ${DISK}
   rbd -p $POOL create --image-feature layering --size $SIZE ${DISK}
-  rbd-nbd map $POOL/${DISK}  --device /dev/nbd0
-  dd if=/dev/nvme0n1 of=/dev/nbd0 bs=4M && sync
-  rbd-nbd unmap /dev/nbd0
+  POOL=$POOL DISK=$DISK fio init-disk.fio > /dev/null 
 }
 
 function init_tier {
@@ -55,7 +48,7 @@ do
   RTIME=$RTIME POOL=$POOL DISK=$DISK fio fios/$op > logs/tier/${op}.log 2>&1
   echo ">>> tier $op end"
   ceph osd tier cache-mode $POOL none --yes-i-really-mean-it
-  rados -p $POOL cache-demote-all
+  rados -p $POOL cache-demote-all > /dev/null
 done
 
 # without tier
