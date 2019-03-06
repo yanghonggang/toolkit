@@ -9,13 +9,15 @@ DRY_RUN="true"
 function init_tier {
   ceph osd tier cache-mode $POOL local --yes-i-really-mean-it
   ceph osd pool set $POOL hit_set_type bloom                                                     
-  ceph osd pool set $POOL hit_set_count 4 
-  ceph osd pool set $POOL hit_set_period 60 
+  ceph osd pool set $POOL hit_set_count 1 
+  ceph osd pool set $POOL hit_set_period 1200 
   ceph osd pool set $POOL hit_set_grade_decay_rate 20                                            
   ceph osd pool set $POOL hit_set_search_last_n 1                                                
   ceph osd pool set $POOL min_read_recency_for_promote 3
   ceph osd pool set $POOL min_write_recency_for_promote 3                                      
   ceph osd pool set $POOL cache_local_mode_default_fast 1
+  ceph osd pool set $POOL cache_target_dirty_ratio 0.5
+  ceph osd pool set $POOL cache_target_full_ratio 0.8
 }
 
 function cleanup_data_pool {
